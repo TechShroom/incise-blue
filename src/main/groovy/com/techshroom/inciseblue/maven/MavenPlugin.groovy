@@ -41,8 +41,8 @@ class MavenPlugin implements Plugin<Project> {
             project.logger.lifecycle('[IBMaven] Disabling uploads for non-SNAPSHOT Travis build.')
             project.uploadArchives.onlyIf { false }
         }
-        println("[aversion-com.techshroom.inciseblue.maven] username:password=${project.ossrhUsername}:REDACTED")
-        project.apply plugin: 'com.techshroom.inciseblue.maven'
+        project.logger.info("[IBMaven] username:password=${project.ossrhUsername}:REDACTED")
+        project.apply plugin: 'maven'
         project.afterEvaluate {
             cfg.validate()
             def installer = project.install.repositories.mavenInstaller;

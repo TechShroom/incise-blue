@@ -65,26 +65,30 @@ class InciseBluePlugin implements Plugin<Project> {
             this.project = project
         }
 
-        private void add(Class<? extends Plugin<?>> pluginClass) {
+        private void add(String id) {
             project.apply { ObjectConfigurationAction apply ->
-                apply.plugin(pluginClass)
+                apply.plugin(id)
             }
         }
 
+        private static String id(String kind) {
+            return "com.techshroom.incise-blue.${kind}"
+        }
+
         void apt() {
-            add(AptPlugin.class)
+            add(id('apt'))
         }
 
         void license() {
-            add(LicensePlugin.class)
+            add(id('license'))
         }
 
         void maven() {
-            add(MavenPlugin.class)
+            add(id('maven'))
         }
 
         void util() {
-            add(UtilPlugin.class)
+            add(id('util'))
         }
 
     }

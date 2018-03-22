@@ -79,4 +79,27 @@ class AptProjectTest extends Specification {
         then:
         assert result.task(":compileJava").outcome == TaskOutcome.SUCCESS
     }
+
+    def "apt plugin doesn't duplicate eclipse entries"() {
+        when:
+        newBuildFile("annotationProcessor group: 'com.google.auto.value', name: 'auto-value', version: '1.5.4'")
+
+        def resultOne = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('eclipse', '-Si')
+                .withPluginClasspath()
+                .build()
+        def resultTwo = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('eclipse', '-Si')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        assert resultOne.task(":eclipse").outcome == TaskOutcome.SUCCESS
+        assert resultTwo.task(":eclipse").outcome == TaskOutcome.SUCCESS
+
+        def lines = new File(testProjectDir.root, '.classpath').readLines()
+        assert lines.findAll { l -> l.contains('.apt_generated') }.size() == 1
+    }
 }

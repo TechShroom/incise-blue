@@ -1,0 +1,61 @@
+package com.techshroom.inciseblue.util
+
+import com.techshroom.inciseblue.InciseBluePlugin
+import org.gradle.api.*
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.tasks.compile.*
+import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.api.tasks.scala.ScalaCompile
+import org.gradle.plugins.ide.eclipse.model.EclipseModel
+
+class UtilPlugin implements Plugin<Project> {
+    void apply(Project project) {
+        project.apply plugin: 'java'
+        project.apply plugin: 'eclipse'
+
+        def util = InciseBluePlugin.getExt(project).util
+        project.repositories { RepositoryHandler rh ->
+            rh.jcenter()
+            rh.maven { MavenArtifactRepository repo ->
+                repo.name = "Sonatype Releases"
+                repo.url = 'https://oss.sonatype.org/content/repositories/releases/'
+                repo.metadataSources({ ms -> ms.mavenPom() })
+            }
+            rh.maven { MavenArtifactRepository repo ->
+                repo.name = "Sonatype Snapshots"
+                repo.url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+                repo.metadataSources({ ms -> ms.mavenPom() })
+            }
+        }
+        project.afterEvaluate {
+            def eclipse = project.extensions.getByType(EclipseModel)
+            def cp = 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + util.javaVersion
+            eclipse.classpath.containers.clear()
+            eclipse.classpath.containers cp
+            eclipse.classpath.containers.addAll(util.extraContainers)
+            eclipse.jdt.sourceCompatibility = util.javaVersion
+            eclipse.jdt.targetCompatibility = util.javaVersion
+
+            [JavaCompile, GroovyCompile, ScalaCompile].each { Class<? extends Task> ct ->
+                project.tasks.withType(ct).each { Task t ->
+                    t.sourceCompatibility = util.javaVersion.toString()
+                    t.targetCompatibility = util.javaVersion.toString()
+                }
+            }
+        }
+
+        // apply some good configurations for the java tasks
+        project.tasks.withType(Javadoc).each { Javadoc javadoc ->
+            javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+        }
+
+        project.tasks.withType(JavaCompile).each { JavaCompile compile ->
+            compile.options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-Xlint:-path']
+            compile.options.deprecation = true
+            compile.options.encoding = 'UTF-8'
+            compile.options.incremental = true
+            compile.options.fork = true
+        }
+    }
+}

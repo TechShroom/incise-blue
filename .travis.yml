@@ -1,0 +1,15 @@
+language: java
+script: "./gradlew build -s"
+jdk:
+- oraclejdk8
+before_cache:
+- find $HOME/.gradle -name '*.lock' -print -exec rm -f {} \;
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+sudo: false
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer

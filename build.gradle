@@ -28,10 +28,11 @@ pluginBundle {
     vcsUrl = 'https://github.com/TechShroom/incise-blue'
 
     plugins {
-        apt {
+        inciseBlue {
             id = project.group + '.' + project.name
             displayName = 'incise-blue plugin'
             tags = ['incise-blue', 'apt', 'annotation-processing', 'com.techshroom.inciseblue.maven', 'sonatype', 'deploy', 'java']
+            description = "TechShroom's own build plugin. Extremely biased towards internal desires."
         }
     }
 }

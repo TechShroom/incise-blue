@@ -1,15 +1,18 @@
 package com.techshroom.inciseblue.util
 
 import com.techshroom.inciseblue.InciseBluePlugin
-import org.gradle.api.*
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
-import org.gradle.api.tasks.compile.*
+import org.gradle.api.tasks.compile.GroovyCompile
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.scala.ScalaCompile
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 
-class UtilPlugin implements Plugin<Project> {
+class IBUtilPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.apply plugin: 'java'
         project.apply plugin: 'eclipse'

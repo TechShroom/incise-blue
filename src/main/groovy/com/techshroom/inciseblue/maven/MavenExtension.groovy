@@ -1,6 +1,6 @@
 package com.techshroom.inciseblue.maven
 
-import org.gradle.api.*
+import org.gradle.api.Project
 
 import javax.inject.Inject
 

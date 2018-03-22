@@ -4,7 +4,7 @@ import nl.javadude.gradle.plugins.license.LicenseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class LicensePlugin implements Plugin<Project> {
+class IBLicensePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.pluginManager.apply('com.github.hierynomus.license')

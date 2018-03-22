@@ -20,7 +20,7 @@ class AptProjectTest extends Specification {
                 id 'com.techshroom.incise-blue'
             }
             inciseBlue.plugins {
-                apt()
+                apt
             }
             repositories {
                 jcenter()

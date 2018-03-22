@@ -18,8 +18,8 @@ class LicenseProjectTest extends Specification {
                 id 'com.techshroom.incise-blue'
             }
             inciseBlue.plugins {
-                license()
-                util()
+                license
+                util
             }
         """
         def gradleProps = testProjectDir.newFile("gradle.properties")

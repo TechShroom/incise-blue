@@ -5,7 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
 
-class MavenPlugin implements Plugin<Project> {
+class IBMavenPlugin implements Plugin<Project> {
     void apply(Project project) {
         // Add source/jd tasks
         project.apply plugin: 'java'

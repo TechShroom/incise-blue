@@ -2,6 +2,7 @@ package com.techshroom.inciseblue
 
 import com.techshroom.inciseblue.apt.IBAptPlugin
 import com.techshroom.inciseblue.license.IBLicensePlugin
+import com.techshroom.inciseblue.lwjgl.IBLwjglPlugin
 import com.techshroom.inciseblue.maven.IBMavenPlugin
 import com.techshroom.inciseblue.util.IBUtilPlugin
 import org.gradle.api.Plugin
@@ -37,6 +38,10 @@ class InciseBluePluginApplication {
 
     void license() {
         add(IBLicensePlugin.class)
+    }
+
+    void lwjgl() {
+        add(IBLwjglPlugin.class)
     }
 
     void maven() {

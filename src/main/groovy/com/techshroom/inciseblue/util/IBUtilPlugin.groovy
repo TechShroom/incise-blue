@@ -33,9 +33,6 @@ class IBUtilPlugin implements Plugin<Project> {
         }
         project.afterEvaluate {
             def eclipse = project.extensions.getByType(EclipseModel)
-            def cp = 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + util.javaVersion
-            eclipse.classpath.containers.clear()
-            eclipse.classpath.containers cp
             eclipse.classpath.containers.addAll(util.extraContainers)
             eclipse.jdt.sourceCompatibility = util.javaVersion
             eclipse.jdt.targetCompatibility = util.javaVersion

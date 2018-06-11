@@ -33,9 +33,16 @@ class IBUtilPlugin implements Plugin<Project> {
         }
         project.afterEvaluate {
             def eclipse = project.extensions.getByType(EclipseModel)
-            eclipse.classpath.containers.addAll(util.extraContainers)
+            eclipse.classpath.containers.addAll(util.computeFullExtraContainers())
             eclipse.jdt.sourceCompatibility = util.javaVersion
             eclipse.jdt.targetCompatibility = util.javaVersion
+
+            if (util.isJavaFx()) {
+                eclipse.project {p ->
+                    p.natures 'org.eclipse.xtext.ui.shared.xtextNature'
+                    p.buildCommand 'org.eclipse.xtext.ui.shared.xtextBuilder'
+                }
+            }
 
             [JavaCompile, GroovyCompile, ScalaCompile].each { Class<? extends Task> ct ->
                 project.tasks.withType(ct).each { Task t ->

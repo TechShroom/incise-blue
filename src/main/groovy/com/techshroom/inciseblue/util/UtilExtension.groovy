@@ -8,6 +8,7 @@ import javax.inject.Inject
 class UtilExtension {
     private JavaVersion javaVersion = null
     private List<String> extraContainers = []
+    private boolean javaFx = false
 
     @Inject
     UtilExtension() {
@@ -28,12 +29,28 @@ class UtilExtension {
         return extraContainers
     }
 
+    List<String> computeFullExtraContainers() {
+        def containers = extraContainers.collect()
+        if (javaFx) {
+            containers.add('org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER')
+        }
+        return containers
+    }
+
     void setExtraContainers(List<String> extraContainers) {
         this.extraContainers = extraContainers
     }
 
-    void addJavaFx() {
-        extraContainers.add('org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER')
+    boolean isJavaFx() {
+        return this.javaFx
+    }
+
+    void setJavaFx(boolean javaFx) {
+        this.javaFx = javaFx
+    }
+
+    void javaFx() {
+        setJavaFx(true)
     }
 
     // helpers:

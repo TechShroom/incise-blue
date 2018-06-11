@@ -32,6 +32,10 @@ class UtilExtension {
         this.extraContainers = extraContainers
     }
 
+    void addJavaFx() {
+        extraContainers.add('org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER')
+    }
+
     // helpers:
     /**
      * Get property from Gradle, Java system properties, or environment, in that order.

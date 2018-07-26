@@ -10,7 +10,9 @@ import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.scala.ScalaCompile
+import org.gradle.api.tasks.testing.Test
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
+import org.gradle.tooling.model.eclipse.EclipseProject
 
 class IBUtilPlugin implements Plugin<Project> {
     void apply(Project project) {
@@ -18,19 +20,7 @@ class IBUtilPlugin implements Plugin<Project> {
         project.apply plugin: 'eclipse'
 
         def util = InciseBluePlugin.getExt(project).util
-        project.repositories { RepositoryHandler rh ->
-            rh.jcenter()
-            rh.maven { MavenArtifactRepository repo ->
-                repo.name = "Sonatype Releases"
-                repo.url = 'https://oss.sonatype.org/content/repositories/releases/'
-                repo.metadataSources({ ms -> ms.mavenPom() })
-            }
-            rh.maven { MavenArtifactRepository repo ->
-                repo.name = "Sonatype Snapshots"
-                repo.url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-                repo.metadataSources({ ms -> ms.mavenPom() })
-            }
-        }
+
         project.afterEvaluate {
             def eclipse = project.extensions.getByType(EclipseModel)
             eclipse.classpath.containers.addAll(util.computeFullExtraContainers())
@@ -38,7 +28,7 @@ class IBUtilPlugin implements Plugin<Project> {
             eclipse.jdt.targetCompatibility = util.javaVersion
 
             if (util.isJavaFx()) {
-                eclipse.project {p ->
+                eclipse.project { EclipseProject p ->
                     p.natures 'org.eclipse.xtext.ui.shared.xtextNature'
                     p.buildCommand 'org.eclipse.xtext.ui.shared.xtextBuilder'
                 }
@@ -52,11 +42,35 @@ class IBUtilPlugin implements Plugin<Project> {
             }
         }
 
-        // apply some good configurations for the java tasks
+        setupRepositories(project)
+        setupJavadocTasks(project)
+        setupJavaCompileTasks(project)
+        setupTestTasks(project)
+    }
+
+    private static setupRepositories(Project project) {
+        project.repositories { RepositoryHandler rh ->
+            rh.jcenter()
+            rh.maven { MavenArtifactRepository repo ->
+                repo.name = "Sonatype Releases"
+                repo.url = 'https://oss.sonatype.org/content/repositories/releases/'
+                repo.metadataSources({ ms -> ms.mavenPom() })
+            }
+            rh.maven { MavenArtifactRepository repo ->
+                repo.name = "Sonatype Snapshots"
+                repo.url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+                repo.metadataSources({ ms -> ms.mavenPom() })
+            }
+        }
+    }
+
+    private static setupJavadocTasks(Project project) {
         project.tasks.withType(Javadoc).each { Javadoc javadoc ->
             javadoc.options.addStringOption('Xdoclint:none', '-quiet')
         }
+    }
 
+    private static setupJavaCompileTasks(Project project) {
         project.tasks.withType(JavaCompile).each { JavaCompile compile ->
             compile.options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-Xlint:-path']
             compile.options.deprecation = true
@@ -64,5 +78,9 @@ class IBUtilPlugin implements Plugin<Project> {
             compile.options.incremental = true
             compile.options.fork = true
         }
+    }
+
+    private static setupTestTasks(Project project) {
+        project.tasks.withType(Test).each { Test test -> test.useJUnitPlatform() }
     }
 }

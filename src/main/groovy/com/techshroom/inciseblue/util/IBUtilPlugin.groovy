@@ -12,7 +12,7 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.scala.ScalaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
-import org.gradle.tooling.model.eclipse.EclipseProject
+import org.gradle.plugins.ide.eclipse.model.EclipseProject
 
 class IBUtilPlugin implements Plugin<Project> {
     void apply(Project project) {

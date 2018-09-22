@@ -1,8 +1,8 @@
 plugins {
-    id "com.gradle.plugin-publish" version "0.9.10"
+    id "com.gradle.plugin-publish" version "0.10.0"
     id 'groovy'
     id 'java-gradle-plugin'
-    id "net.researchgate.release" version "2.6.0"
+    id "net.researchgate.release" version "2.7.0"
     id "com.palantir.idea-test-fix" version "0.1.0"
 }
 

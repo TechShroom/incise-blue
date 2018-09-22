@@ -12,7 +12,7 @@ class IBLicensePlugin implements Plugin<Project> {
         LicenseExtension license = project.extensions.getByType(LicenseExtension)
 
         license.ext {
-            name = project.name
+            name = project.rootProject.name
             organization = project.rootProject.organization
             url = project.rootProject.url
         }

@@ -32,7 +32,7 @@ class IBIdePlugin : Plugin<Project> {
     }
 
     private fun Project.configureIntellij() {
-        apply(plugin = "intellij")
+        apply(plugin = "idea")
     }
 }
 

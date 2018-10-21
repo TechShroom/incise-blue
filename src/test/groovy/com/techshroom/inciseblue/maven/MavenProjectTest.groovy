@@ -33,7 +33,6 @@ class MavenProjectTest extends Specification {
                 .withProjectDir(testProjectDir.root)
                 .withArguments('tasks', '-Si')
                 .withPluginClasspath()
-                .forwardOutput()
                 .build()
 
         then:

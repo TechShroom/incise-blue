@@ -1,4 +1,4 @@
-package com.techshroom.inciseblue.license
+package com.techshroom.inciseblue.ide
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -6,30 +6,24 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-class LicenseProjectTest extends Specification {
+class IdeProjectTest extends Specification {
     @Rule
     final TemporaryFolder testProjectDir = new TemporaryFolder()
     File buildFile
 
     def newBuildFile() {
         buildFile = testProjectDir.newFile('build.gradle')
-        buildFile << """ 
+        buildFile << """
             plugins {
                 id 'com.techshroom.incise-blue'
             }
             inciseBlue {
-                license()
-                util()
+                ide()
             }
-        """
-        def gradleProps = testProjectDir.newFile("gradle.properties")
-        gradleProps << """
-            organization=foo
-            url=https://example.com
         """
     }
 
-    def "license plugin doesn't break build"() {
+    def "ide plugin doesn't break build"() {
         when:
         newBuildFile()
         def result = GradleRunner.create()

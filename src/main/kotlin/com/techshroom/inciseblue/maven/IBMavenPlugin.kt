@@ -32,14 +32,13 @@ class IBMavenPlugin : Plugin<Project> {
             return
         }
 
+        val isSnapshot = (project.version as? String)?.endsWith("-SNAPSHOT") == true
+        configureMavenPublish(project, isSnapshot, ossrhUsername, ossrhPassword, sourceJar, javadocJar)
+
         val publishTaskProvider = project.tasks.named("publish")
 
         hookReleasePlugin(project, publishTaskProvider)
-
-        val isSnapshot = (project.version as? String)?.endsWith("-SNAPSHOT") == true
         disableIfNeeded(publishTaskProvider, isSnapshot, project)
-
-        configureMavenPublish(project, isSnapshot, ossrhUsername, ossrhPassword, sourceJar, javadocJar)
     }
 
     private fun configureMavenPublish(project: Project, isSnapshot: Boolean, ossrhUsername: String?, ossrhPassword: String?, sourceJar: NamedDomainObjectProvider<Jar>, javadocJar: NamedDomainObjectProvider<Jar>) {

@@ -57,6 +57,7 @@ class IBMavenPlugin : Plugin<Project> {
 
     private fun applySigningIfNeeded(cfg: MavenExtension, project: Project) {
         if (cfg.doSigning) {
+            project.logger.lifecycle("[IBMaven] Signing enabled.")
             project.apply(plugin = "signing")
             project.configure<SigningExtension> {
                 sign(project.extensions.getByType<PublishingExtension>()

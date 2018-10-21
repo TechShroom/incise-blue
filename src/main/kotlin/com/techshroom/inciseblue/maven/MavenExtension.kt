@@ -4,7 +4,7 @@ import org.gradle.api.Project
 import javax.inject.Inject
 
 open class MavenExtension @Inject constructor(project: Project) {
-    var doSigning: Boolean = System.getenv("TRAVIS")?.toBoolean() == false
+    var doSigning: Boolean = System.getenv("TRAVIS")?.toBoolean() != true
     var repo: String = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     var snapshotRepo: String = "https://oss.sonatype.org/content/repositories/snapshots/"
     lateinit var projectDescription: String

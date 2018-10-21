@@ -18,13 +18,13 @@ class LwjglProjectTest extends Specification {
         buildFile << """
             plugins {
                 id 'com.techshroom.incise-blue'
+                id 'java'
             }
-            inciseBlue.plugins {
-                lwjgl
-                util
-            }
-            inciseBlue.lwjgl {
-                lwjglVersion '${LWJGL_VERSION}'
+            inciseBlue {
+                lwjgl {
+                    lwjglVersion '${LWJGL_VERSION}'
+                }
+                util()
             }
         """
     }
@@ -34,12 +34,12 @@ class LwjglProjectTest extends Specification {
         newBuildFile()
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('build', '-Si')
+                .withArguments('tasks', '-Si')
                 .withPluginClasspath()
                 .build()
 
         then:
-        assert result.task(":build").outcome == TaskOutcome.SUCCESS
+        assert result.task(":tasks").outcome == TaskOutcome.SUCCESS
     }
 
     def "lwjgl plugin adds dependencies"() {

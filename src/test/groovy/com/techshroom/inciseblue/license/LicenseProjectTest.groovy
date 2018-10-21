@@ -17,9 +17,9 @@ class LicenseProjectTest extends Specification {
             plugins {
                 id 'com.techshroom.incise-blue'
             }
-            inciseBlue.plugins {
-                license
-                util
+            inciseBlue {
+                license()
+                util()
             }
         """
         def gradleProps = testProjectDir.newFile("gradle.properties")
@@ -34,11 +34,12 @@ class LicenseProjectTest extends Specification {
         newBuildFile()
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('build', '-Si')
+                .withArguments('tasks', '-Si')
                 .withPluginClasspath()
+                .forwardOutput()
                 .build()
 
         then:
-        assert result.task(":build").outcome == TaskOutcome.SUCCESS
+        assert result.task(":tasks").outcome == TaskOutcome.SUCCESS
     }
 }

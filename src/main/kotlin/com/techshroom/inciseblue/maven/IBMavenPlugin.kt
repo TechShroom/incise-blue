@@ -11,12 +11,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.*
 import org.gradle.plugins.signing.SigningExtension
 
 class IBMavenPlugin : Plugin<Project> {
@@ -25,8 +20,7 @@ class IBMavenPlugin : Plugin<Project> {
         val sourceJar = createSourceJarTask(project)
         val javadocJar = createJavadocJarTask(project)
 
-        val pair = ossrhCreds(project)
-        val (ossrhUsername, ossrhPassword) = pair
+        val (ossrhUsername, ossrhPassword) = ossrhCreds(project)
         if (ossrhUsername.isNullOrBlank() || ossrhPassword.isNullOrBlank()) {
             project.logger.lifecycle("[IBMaven] Skipping upload configuration due to missing username/password data.")
             return
@@ -74,8 +68,8 @@ class IBMavenPlugin : Plugin<Project> {
     private fun MavenPublication.configureMavenPom(cfg: MavenExtension, project: Project, sourceJar: NamedDomainObjectProvider<Jar>, javadocJar: NamedDomainObjectProvider<Jar>) {
         artifactId = cfg.artifactName
         from(project.components.getByName("java"))
-        artifact(sourceJar)
-        artifact(javadocJar)
+        artifact(sourceJar.get())
+        artifact(javadocJar.get())
 
         pom {
             val httpsUrl = "https://github.com${cfg.coord}"
@@ -155,8 +149,7 @@ class IBMavenPlugin : Plugin<Project> {
     }
 
     private fun createSourceJarTask(project: Project): NamedDomainObjectProvider<Jar> {
-        val sourceJar = project.tasks.register<Jar>("sourceJar")
-        sourceJar.configure {
+        val sourceJar by project.tasks.registering(Jar::class) {
             dependsOn("classes")
             classifier = "sources"
             val sourceSets = project.extensions.getByType<SourceSetContainer>()
@@ -166,8 +159,7 @@ class IBMavenPlugin : Plugin<Project> {
     }
 
     private fun createJavadocJarTask(project: Project): NamedDomainObjectProvider<Jar> {
-        val javadocJar = project.tasks.register<Jar>("javadocJar")
-        javadocJar.configure {
+        val javadocJar by project.tasks.registering(Jar::class) {
             val jdTask = project.tasks.withType<Javadoc>().named("javadoc").get()
             dependsOn(jdTask)
             classifier = "javadoc"

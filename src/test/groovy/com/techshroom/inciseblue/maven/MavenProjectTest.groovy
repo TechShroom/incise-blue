@@ -17,6 +17,8 @@ class MavenProjectTest extends Specification {
             plugins {
                 id 'com.techshroom.incise-blue'
             }
+            ext.ossrhUsername = "nobody"
+            ext.ossrhPassword = "important"
             inciseBlue {
                 maven {
                     projectDescription = "Nothing special."

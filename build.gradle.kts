@@ -37,10 +37,9 @@ pluginBundle {
             id = "${project.group}.${project.name}"
             displayName = "incise-blue plugin"
             tags = listOf(
-                    "incise-blue", "apt",
-                    "annotation-processing",
-                    "sonatype", "deploy",
-                    "java", "kotlin")
+                    "incise-blue", "maven-publish",
+                    "java", "ide", "eclipse",
+                    "intellij", "kotlin-dsl")
             description = "TechShroom's own build plugin. Extremely biased towards internal desires."
         }
     }

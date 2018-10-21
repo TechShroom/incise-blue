@@ -3,7 +3,7 @@ TechShroom's all-inclusive utility plugin. Common patterns are kept in
 plugins, and applied to many, many, projects.
 
 Available plugins:
-- `incise-blue.com.techshroom.inciseblue.apt` -- Annotation processing patterns
-- `incise-blue.com.techshroom.inciseblue.maven` -- Sonatype deployment patterns
-- `incise-blue.com.techshroom.inciseblue.license` -- License application patterns
-- `incise-blue.com.techshroom.inciseblue.util` -- IDE/QoL patterns, i.e. common Java version
+- `inciseBlue.maven` -- Sonatype deployment patterns
+- `inciseBlue.license` -- License application patterns
+- `inciseBlue.util` -- QoL patterns, e.g. common Java version, `Javadoc` & `JavaCompile` task fixes
+- `inciseBlue.ide` -- IDE setup & hook patterns

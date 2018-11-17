@@ -63,4 +63,22 @@ class UtilProjectTest extends Specification {
         then:
         assert result.task(":javaCompileIs18").outcome == TaskOutcome.SUCCESS
     }
+
+    def "util plugin skips eclipse java version if no plugin"() {
+        // This used to crash, regression test
+        when:
+        newBuildFile()
+        buildFile << """
+            apply plugin: "eclipse"
+            inciseBlue.util.javaVersion = "1.8"
+        """
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('tasks', '-Si')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        assert result.task(":tasks").outcome == TaskOutcome.SUCCESS
+    }
 }

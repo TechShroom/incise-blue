@@ -104,10 +104,12 @@ class IBUtilPlugin : Plugin<Project> {
     private fun Project.applyJavaVersionToEclipse() {
         configure<EclipseModel> {
             classpath {
-                jdt {
-                    val javaVersion = ibExt.util.javaVersion
-                    sourceCompatibility = javaVersion
-                    targetCompatibility = javaVersion
+                if (jdt != null) {
+                    jdt {
+                        val javaVersion = ibExt.util.javaVersion
+                        sourceCompatibility = javaVersion
+                        targetCompatibility = javaVersion
+                    }
                 }
             }
         }

@@ -61,4 +61,24 @@ class MavenProjectTest extends Specification {
         then:
         assert result.task(":requirePublishApplied").outcome == TaskOutcome.SUCCESS
     }
+
+    def "maven plugin doesn't apply signing if it's not possible"() {
+        when:
+        newBuildFile("", "")
+        buildFile << """
+            task requireNoSigning() {
+                doLast {
+                    assert project.tasks.findByName("signMavenPublication") == null
+                }
+            }
+        """
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('requireNoSigning', '-Si')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        assert result.task(":requireNoSigning").outcome == TaskOutcome.SUCCESS
+    }
 }

@@ -61,8 +61,11 @@ class IBMavenPlugin : Plugin<Project> {
             project.logger.lifecycle("[IBMaven] Signing enabled.")
             project.apply(plugin = "signing")
             project.configure<SigningExtension> {
-                sign(project.extensions.getByType<PublishingExtension>()
-                        .publications.getByName("maven"))
+                // Only sign if it's possible.
+                if (this.signatories.getDefaultSignatory(project) != null) {
+                    sign(project.extensions.getByType<PublishingExtension>()
+                            .publications.getByName("maven"))
+                }
             }
         }
     }

@@ -11,14 +11,14 @@ class MavenProjectTest extends Specification {
     final TemporaryFolder testProjectDir = new TemporaryFolder()
     File buildFile
 
-    def newBuildFile() {
+    def newBuildFile(String username = "nobody", String password = "important") {
         buildFile = testProjectDir.newFile('build.gradle')
         buildFile << """
             plugins {
                 id 'com.techshroom.incise-blue'
             }
-            ext.ossrhUsername = "nobody"
-            ext.ossrhPassword = "important"
+            ext.ossrhUsername = "$username"
+            ext.ossrhPassword = "$password"
             inciseBlue {
                 maven {
                     projectDescription = "Nothing special."
@@ -39,5 +39,26 @@ class MavenProjectTest extends Specification {
 
         then:
         assert result.task(":tasks").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "maven plugin always applies publishing, even without credentials"() {
+        when:
+        newBuildFile("", "")
+        buildFile << """
+            task requirePublishApplied() {
+                doLast {
+                    assert project.findProperty("ossrhUsername") == ""
+                    project.tasks.getByName("publishToMavenLocal")
+                }
+            }
+        """
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('requirePublishApplied', '-Si')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        assert result.task(":requirePublishApplied").outcome == TaskOutcome.SUCCESS
     }
 }

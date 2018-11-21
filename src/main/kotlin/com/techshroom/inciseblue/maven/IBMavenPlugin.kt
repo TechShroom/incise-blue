@@ -1,5 +1,6 @@
 package com.techshroom.inciseblue.maven
 
+import com.techshroom.inciseblue.blankToNull
 import com.techshroom.inciseblue.ibExt
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
@@ -20,14 +21,10 @@ class IBMavenPlugin : Plugin<Project> {
         val sourceJar = createSourceJarTask(project)
         val javadocJar = createJavadocJarTask(project)
 
-        val (ossrhUsername, ossrhPassword) = ossrhCreds(project)
-        if (ossrhUsername.isNullOrBlank() || ossrhPassword.isNullOrBlank()) {
-            project.logger.lifecycle("[IBMaven] Skipping upload configuration due to missing username/password data.")
-            return
-        }
+        val creds = ossrhCreds(project)
 
         val isSnapshot = (project.version as? String)?.endsWith("-SNAPSHOT") == true
-        configureMavenPublish(project, isSnapshot, ossrhUsername, ossrhPassword, sourceJar, javadocJar)
+        configureMavenPublish(project, isSnapshot, creds, sourceJar, javadocJar)
 
         val publishTaskProvider = project.tasks.named("publish")
 
@@ -35,7 +32,7 @@ class IBMavenPlugin : Plugin<Project> {
         disableIfNeeded(publishTaskProvider, isSnapshot, project)
     }
 
-    private fun configureMavenPublish(project: Project, isSnapshot: Boolean, ossrhUsername: String?, ossrhPassword: String?, sourceJar: NamedDomainObjectProvider<Jar>, javadocJar: NamedDomainObjectProvider<Jar>) {
+    private fun configureMavenPublish(project: Project, isSnapshot: Boolean, creds: Credentials?, sourceJar: NamedDomainObjectProvider<Jar>, javadocJar: NamedDomainObjectProvider<Jar>) {
         val cfg = project.ibExt.maven
 
         project.apply(plugin = "maven-publish")
@@ -43,7 +40,11 @@ class IBMavenPlugin : Plugin<Project> {
             cfg.validate()
 
             project.configure<PublishingExtension> {
-                addRepositories(project, isSnapshot, cfg, ossrhUsername, ossrhPassword)
+                if (creds != null) {
+                    addRepositories(project, isSnapshot, cfg, creds)
+                } else {
+                    project.logger.lifecycle("[IBMaven] Disabling remote upload, no credentials found.")
+                }
                 publications {
                     create<MavenPublication>("maven") {
                         configureMavenPom(cfg, project, sourceJar, javadocJar)
@@ -102,7 +103,7 @@ class IBMavenPlugin : Plugin<Project> {
         }
     }
 
-    private fun PublishingExtension.addRepositories(project: Project, isSnapshot: Boolean, cfg: MavenExtension, ossrhUsername: String?, ossrhPassword: String?) {
+    private fun PublishingExtension.addRepositories(project: Project, isSnapshot: Boolean, cfg: MavenExtension, creds: Credentials) {
         repositories {
             maven {
                 name = "IBMaven Publishing Repository"
@@ -112,8 +113,8 @@ class IBMavenPlugin : Plugin<Project> {
                 })
 
                 credentials {
-                    username = ossrhUsername
-                    password = ossrhPassword
+                    username = creds.username
+                    password = creds.password
                 }
             }
         }
@@ -140,13 +141,27 @@ class IBMavenPlugin : Plugin<Project> {
         }
     }
 
-    private fun ossrhCreds(project: Project): Pair<String?, String?> {
-        val ossrhUsername: String? = project.findProperty("ossrhUsername") as? String
-        var ossrhPassword: String? = project.findProperty("ossrhPassword") as? String
-        if (ossrhPassword == null) {
-            ossrhPassword = System.getenv("OSSRH_PASSWORD") ?: null
+    private data class Credentials(val username: String, val password: String)
+
+    private fun ossrhCreds(project: Project): Credentials? {
+        val usernameOptions = listOf(
+                project.findProperty("ossrhUsername") as? String
+        )
+        val passwordOptions = listOf(
+                project.findProperty("ossrhPassword") as? String,
+                System.getenv("OSSRH_PASSWORD")
+        )
+        val username = usernameOptions
+                .mapNotNull { it.blankToNull() }
+                .firstOrNull()
+        val password = passwordOptions
+                .mapNotNull { it.blankToNull() }
+                .firstOrNull()
+
+        return when {
+            username == null || password == null -> null
+            else -> Credentials(username, password)
         }
-        return Pair(ossrhUsername, ossrhPassword)
     }
 
     private fun createSourceJarTask(project: Project): NamedDomainObjectProvider<Jar> {

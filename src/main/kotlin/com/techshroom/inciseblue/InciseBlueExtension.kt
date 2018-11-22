@@ -12,17 +12,19 @@ import com.techshroom.inciseblue.util.UtilExtension
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.newInstance
+import org.gradle.kotlin.dsl.*
 
 open class InciseBlueExtension constructor(private val project: Project) {
 
     val lwjgl: LwjglExtension = project.objects.newInstance()
     val maven: MavenExtension = project.objects.newInstance(project)
-    val util: UtilExtension = project.objects.newInstance()
+    val util: UtilExtension = project.objects.newInstance(project)
     val ide: IdeExtension = project.objects.newInstance()
 
     private inline fun <reified T : Plugin<Project>> addPlugin() {
-        project.pluginManager.apply(T::class.java)
+        project.apply {
+            plugin<T>()
+        }
     }
 
     fun license() {

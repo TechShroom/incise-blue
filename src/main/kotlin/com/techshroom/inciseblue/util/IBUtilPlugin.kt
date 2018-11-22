@@ -22,9 +22,6 @@ class IBUtilPlugin : Plugin<Project> {
         project.addIBRepositories()
         project.fixJavadocTasks()
         project.fixJavaCompileTasks()
-        if (project.ibExt.util.junit5) {
-            project.setupJunit5()
-        }
         project.hookPluginsForJavaVersion()
     }
 
@@ -69,7 +66,8 @@ class IBUtilPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.setupJunit5() {
+    // for extension
+    internal fun Project.setupJUnit5() {
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }

@@ -81,4 +81,29 @@ class UtilProjectTest extends Specification {
         then:
         assert result.task(":tasks").outcome == TaskOutcome.SUCCESS
     }
+
+    def "util plugin sets up JUnit Platform if requested"() {
+        when:
+        newBuildFile()
+        buildFile << """
+            apply plugin: "java"
+            inciseBlue.util.enableJUnit5()
+
+            task isUsingJunitPlatform() {
+                doLast {
+                    if (!(tasks.getByName("test").testFramework.class.name.contains("JUnitPlatform"))) {
+                        throw new IllegalStateException()
+                    }
+                }
+            }
+        """
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('isUsingJunitPlatform', '-Si')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        assert result.task(":isUsingJunitPlatform").outcome == TaskOutcome.SUCCESS
+    }
 }

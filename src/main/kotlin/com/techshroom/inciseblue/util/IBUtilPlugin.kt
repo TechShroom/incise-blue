@@ -3,6 +3,9 @@ package com.techshroom.inciseblue.util
 import com.techshroom.inciseblue.ibExt
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.GroovyBasePlugin
+import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.plugins.scala.ScalaBasePlugin
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.compile.JavaCompile
@@ -13,7 +16,9 @@ import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.withType
+import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
+import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
@@ -74,19 +79,19 @@ class IBUtilPlugin : Plugin<Project> {
     }
 
     private fun Project.hookPluginsForJavaVersion() {
-        plugins.withId("java") {
+        plugins.withType<JavaBasePlugin> {
             applyJavaVersion<JavaCompile>()
         }
-        plugins.withId("groovy") {
+        plugins.withType<GroovyBasePlugin> {
             applyJavaVersion<GroovyCompile>()
         }
-        plugins.withId("scala") {
+        plugins.withType<ScalaBasePlugin> {
             applyJavaVersion<ScalaCompile>()
         }
-        plugins.withId("eclipse") {
+        plugins.withType<EclipsePlugin> {
             applyJavaVersionToEclipse()
         }
-        plugins.withId("intellij") {
+        plugins.withType<IdeaPlugin> {
             applyJavaVersionToIntellij()
         }
     }
@@ -118,6 +123,10 @@ class IBUtilPlugin : Plugin<Project> {
             val javaVersion = ibExt.util.javaVersion
             module.jdkName = javaVersion.toString()
             module.languageLevel = IdeaLanguageLevel(javaVersion)
+
+            // set project if it's present too
+            project?.jdkName = javaVersion.toString()
+            project?.languageLevel = IdeaLanguageLevel(javaVersion)
         }
     }
 

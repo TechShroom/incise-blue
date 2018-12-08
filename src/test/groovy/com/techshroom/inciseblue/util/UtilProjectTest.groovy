@@ -42,14 +42,21 @@ class UtilProjectTest extends Specification {
         buildFile << """
             inciseBlue.util.javaVersion = "1.8"
             apply plugin: "java"
+            apply plugin: "idea"
 
             task javaCompileIs18() {
                 doLast {
                     if (project.compileJava.sourceCompatibility != "1.8") {
-                        throw new IllegalStateException();
+                        throw new IllegalStateException("sourceCompatibility");
                     }
                     if (project.compileJava.targetCompatibility != "1.8") {
-                        throw new IllegalStateException();
+                        throw new IllegalStateException("targetCompatibility");
+                    }
+                    if (project.idea.project.jdkName != "1.8") {
+                        throw new IllegalStateException("jdkName");
+                    }
+                    if (project.idea.project.languageLevel.level != "JDK_1_8") {
+                        throw new IllegalStateException("jdkName");
                     }
                 }
             }

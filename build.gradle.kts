@@ -70,6 +70,20 @@ pluginBundle {
     }
 }
 
-tasks.named("afterReleaseBuild").configure {
+// validate the current JDK, we must be running under JDK 8.
+val verifyJavaVersionForPublish by tasks.registering {
+    description = "Validates the JDK for the publish build, to ensure consistency."
+    doLast {
+        if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+            throw IllegalStateException("Must build release with JDK 8.")
+        }
+    }
+}
+
+tasks.named<Task>("publishPlugins") {
+    dependsOn(verifyJavaVersionForPublish)
+}
+
+tasks.named<Task>("afterReleaseBuild") {
     dependsOn("publishPlugins")
 }

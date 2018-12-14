@@ -80,8 +80,8 @@ val verifyJavaVersionForPublish by tasks.registering {
     }
 }
 
-tasks.named<Task>("publishPlugins") {
-    dependsOn(verifyJavaVersionForPublish)
+release {
+    buildTasks.add(verifyJavaVersionForPublish.name)
 }
 
 tasks.named<Task>("afterReleaseBuild") {

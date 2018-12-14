@@ -1,4 +1,6 @@
+import org.gradle.api.internal.tasks.DefaultTaskDependency
 import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.serialization.js.DynamicTypeDeserializer.id
 
 plugins {
@@ -25,6 +27,29 @@ dependencies {
     testCompile("com.google.guava:guava:27.0-jre")
     testCompile("org.spockframework:spock-core:1.1-groovy-2.4") {
         exclude(group = "org.codehaus.groovy")
+    }
+}
+
+tasks.named<Copy>("processResources") {
+    filter {
+        it.replace("%VERSION%", project.version.toString())
+    }
+}
+
+// include our Groovy extensions last
+tasks {
+    val compileKotlin = named<KotlinCompile>("compileKotlin")
+    val compileGroovy = named<GroovyCompile>("compileGroovy")
+    compileKotlin.configure {
+        setDependsOn(dependsOn.minus("compileJava"))
+    }
+    compileGroovy.configure {
+        dependsOn(compileKotlin)
+        val kt = compileKotlin.get()
+        classpath = classpath.plus(files(kt.destinationDir))
+    }
+    named<Task>("classes") {
+        dependsOn(compileGroovy)
     }
 }
 

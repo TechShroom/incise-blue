@@ -1,21 +1,28 @@
 package com.techshroom.inciseblue
 
+import groovy.lang.Closure
+import groovy.lang.DelegatesTo
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.util.ConfigureUtil
 
 interface LibVariantPicker {
-    fun lib(name: String? = null): Dependency
+    fun lib(): Dependency
+    fun lib(name: String): Dependency
 }
 
 fun Project.commonLib(group: String,
                       nameBase: String,
                       version: String,
-                      variantPicker: LibVariantPicker.() -> Unit) {
+                      variantPicker: Action<LibVariantPicker>) {
     val project = this
     val variantPickerDelegate: LibVariantPicker = object : LibVariantPicker {
-        override fun lib(name: String?): Dependency {
+        override fun lib() = libShared("")
+        override fun lib(name: String) = libShared(name)
+        private fun libShared(name: String): Dependency {
             val calcName = when {
-                name.isNullOrEmpty() -> nameBase
+                name.isEmpty() -> nameBase
                 else -> "$nameBase-$name"
             }
 
@@ -25,5 +32,5 @@ fun Project.commonLib(group: String,
                     "version" to version))
         }
     }
-    variantPickerDelegate.apply(variantPicker)
+    variantPicker.execute(variantPickerDelegate)
 }

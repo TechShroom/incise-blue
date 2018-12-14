@@ -1,0 +1,3 @@
+moduleName=incise-blue
+moduleVersion=%VERSION%
+extensionClasses=com.techshroom.inciseblue.LibVariantsExtension

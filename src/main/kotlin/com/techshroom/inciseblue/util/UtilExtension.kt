@@ -2,7 +2,7 @@ package com.techshroom.inciseblue.util
 
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.getPlugin
 import javax.inject.Inject
 
 open class UtilExtension @Inject constructor(private val project: Project) {
@@ -16,6 +16,12 @@ open class UtilExtension @Inject constructor(private val project: Project) {
     fun enableJUnit5() {
         project.plugins.getPlugin(IBUtilPlugin::class).apply {
             project.setupJUnit5()
+        }
+    }
+
+    fun enableJavaBootstrapFixes() {
+        project.afterEvaluate {
+            fixJavaCompilation(javaVersion)
         }
     }
 }

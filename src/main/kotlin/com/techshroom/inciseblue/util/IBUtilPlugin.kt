@@ -25,8 +25,8 @@ import org.gradle.plugins.ide.idea.model.IdeaModel
 class IBUtilPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.addIBRepositories()
-        project.fixJavadocTasks()
-        project.fixJavaCompileTasks()
+        project.setNiceJavadocOptions()
+        project.setNiceJavaCompileOptions()
         project.hookPluginsForJavaVersion()
     }
 
@@ -50,8 +50,8 @@ class IBUtilPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.fixJavadocTasks() {
-        plugins.withId("java") {
+    private fun Project.setNiceJavadocOptions() {
+        plugins.withType<JavaBasePlugin> {
             tasks.withType<Javadoc>().configureEach {
                 (options as? StandardJavadocDocletOptions)
                         ?.addStringOption("Xdoclint:none", "-quiet")
@@ -59,8 +59,8 @@ class IBUtilPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.fixJavaCompileTasks() {
-        plugins.withId("java") {
+    private fun Project.setNiceJavaCompileOptions() {
+        plugins.withType<JavaBasePlugin> {
             tasks.withType<JavaCompile>().configureEach {
                 options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-processing", "-Xlint:-path"))
                 options.isDeprecation = true
@@ -101,6 +101,8 @@ class IBUtilPlugin : Plugin<Project> {
             val javaVersion = ibExt.util.javaVersion.toString()
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
+
+
         }
     }
 

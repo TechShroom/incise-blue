@@ -22,6 +22,7 @@ dependencies {
     compile(gradleApi())
     compile("gradle.plugin.net.minecrell:licenser:0.4.1")
     compileOnly(kotlin("stdlib-jdk8"))
+    compileOnly(kotlin("gradle-plugin"))
 
     testCompile("junit:junit:4.12")
     testCompile("com.google.guava:guava:27.0-jre")

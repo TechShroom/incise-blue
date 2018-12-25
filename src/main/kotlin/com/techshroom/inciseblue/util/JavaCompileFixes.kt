@@ -15,9 +15,6 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
 
     plugins.withType<JavaBasePlugin> {
         tasks.withType<JavaCompile>().configureEach {
-            sourceCompatibility = javaVersion.toString()
-            targetCompatibility = sourceCompatibility
-
             // --release only works on >=9, although that's really the only place we need it.
             if (JavaVersion.toVersion(toolChain.version) >= JavaVersion.VERSION_1_9) {
                 options.compilerArgs.addAll(listOf("--release", javaVersion.majorVersion))
@@ -32,7 +29,11 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
     plugins.withId("org.jetbrains.kotlin.jvm") {
         tasks.withType<KotlinJvmCompile> {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = when {
+                    javaVersion < JavaVersion.VERSION_1_6 -> throw IllegalArgumentException("Too early for Kotlin.")
+                    javaVersion < JavaVersion.VERSION_1_8 -> "1.6"
+                    else -> "1.8"
+                }
                 jdkHome = javaHome?.toAbsolutePath()?.toString()
             }
         }

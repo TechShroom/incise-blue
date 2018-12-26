@@ -21,7 +21,8 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
             // --release only works on >=9, although that's really the only place we need it.
             if (JavaVersion.toVersion(toolChain.version) >= JavaVersion.VERSION_1_9) {
                 options.compilerArgs.addAll(listOf("--release", javaVersion.majorVersion))
-            } else if (javaHome != null) {
+            }
+            if (javaHome != null) {
                 // attempt to use java home to set bootstrap compatibility
                 options.bootstrapClasspath = project.fileTree("$javaHome/jre/lib")
             }
@@ -46,7 +47,8 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
             javacOptions {
                 if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
                     option("release", javaVersion.majorVersion)
-                } else if (javaHome != null) {
+                }
+                if (javaHome != null) {
                     option("bootclasspath", javaHome)
                 }
             }

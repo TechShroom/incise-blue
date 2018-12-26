@@ -15,6 +15,7 @@ import java.nio.file.Paths
 
 fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
     val javaHome = findJavaHome(javaVersion)?.toAbsolutePath()?.toString()
+    val bscp = project.files("$javaHome/jre/lib")
 
     plugins.withType<JavaBasePlugin> {
         tasks.withType<JavaCompile>().configureEach {
@@ -28,7 +29,7 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
                 // and will not set it, since it is probably already correct
                 // see: android, where it is set to the android SDK already
                 if (options.bootstrapClasspath == null) {
-                    options.bootstrapClasspath = project.fileTree("$javaHome/jre/lib")
+                    options.bootstrapClasspath = bscp
                 } else {
                     logger.info("[IBUtil] Did not set a bootstrap classpath to task $name")
                 }
@@ -56,7 +57,7 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
                     option("-release", javaVersion.majorVersion)
                 }
                 if (javaHome != null) {
-                    option("-bootclasspath", javaHome)
+                    option("-bootclasspath", bscp)
                 }
             }
         }

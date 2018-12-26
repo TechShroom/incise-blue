@@ -21,6 +21,7 @@ import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 class IBUtilPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -94,6 +95,9 @@ class IBUtilPlugin : Plugin<Project> {
         plugins.withType<IdeaPlugin> {
             applyJavaVersionToIntellij()
         }
+        plugins.withId("org.jetbrains.kotlin.kapt") {
+            applyJavaVersionToKapt()
+        }
     }
 
     private inline fun <reified COMPILE_TASK : AbstractCompile> Project.applyJavaVersion() {
@@ -101,8 +105,6 @@ class IBUtilPlugin : Plugin<Project> {
             val javaVersion = ibExt.util.javaVersion.toString()
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
-
-
         }
     }
 
@@ -129,6 +131,15 @@ class IBUtilPlugin : Plugin<Project> {
             // set project if it's present too
             project?.jdkName = javaVersion.toString()
             project?.languageLevel = IdeaLanguageLevel(javaVersion)
+        }
+    }
+
+    private fun Project.applyJavaVersionToKapt() {
+        configure<KaptExtension> {
+            javacOptions {
+                option("target", ibExt.util.javaVersion.toString())
+                option("source", ibExt.util.javaVersion.toString())
+            }
         }
     }
 

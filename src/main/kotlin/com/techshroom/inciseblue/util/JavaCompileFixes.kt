@@ -44,7 +44,9 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
     plugins.withId("org.jetbrains.kotlin.kapt") {
         configure<KaptExtension> {
             javacOptions {
-                if (javaHome != null) {
+                if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+                    option("release", javaVersion.majorVersion)
+                } else if (javaHome != null) {
                     option("bootclasspath", javaHome)
                 }
             }

@@ -24,7 +24,14 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
             }
             if (javaHome != null) {
                 // attempt to use java home to set bootstrap compatibility
-                options.bootstrapClasspath = project.fileTree("$javaHome/jre/lib")
+                // we assume that anything already on there is meant to be there
+                // and will not set it, since it is probably already correct
+                // see: android, where it is set to the android SDK already
+                if (options.bootstrapClasspath == null) {
+                    options.bootstrapClasspath = project.fileTree("$javaHome/jre/lib")
+                } else {
+                    logger.info("[IBUtil] Did not set a bootstrap classpath to task $name")
+                }
             }
         }
     }

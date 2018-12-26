@@ -5,14 +5,16 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
 fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
-    val javaHome = findJavaHome(javaVersion)
+    val javaHome = findJavaHome(javaVersion)?.toAbsolutePath()?.toString()
 
     plugins.withType<JavaBasePlugin> {
         tasks.withType<JavaCompile>().configureEach {
@@ -35,7 +37,16 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
                     javaVersion < JavaVersion.VERSION_1_8 -> "1.6"
                     else -> "1.8"
                 }
-                jdkHome = javaHome?.toAbsolutePath()?.toString()
+                jdkHome = javaHome
+            }
+        }
+    }
+    plugins.withId("org.jetbrains.kotlin.kapt") {
+        configure<KaptExtension> {
+            javacOptions {
+                if (javaHome != null) {
+                    option("bootclasspath", javaHome)
+                }
             }
         }
     }

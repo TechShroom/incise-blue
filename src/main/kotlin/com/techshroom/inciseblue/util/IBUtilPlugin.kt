@@ -137,8 +137,8 @@ class IBUtilPlugin : Plugin<Project> {
     private fun Project.applyJavaVersionToKapt() {
         configure<KaptExtension> {
             javacOptions {
-                option("target", ibExt.util.javaVersion.toString())
-                option("source", ibExt.util.javaVersion.toString())
+                option("-target", ibExt.util.javaVersion.toString())
+                option("-source", ibExt.util.javaVersion.toString())
             }
         }
     }

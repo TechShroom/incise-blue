@@ -1,5 +1,6 @@
 package com.techshroom.inciseblue.util
 
+import com.techshroom.inciseblue.formatForLogging
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
@@ -57,7 +58,7 @@ private fun Project.findJavaHome(javaVersion: JavaVersion): Path? {
                 Please set the property `java${major}Home` to a valid JDK $major home
                 for correct build outcomes.
             """.trimIndent().replace('\n', ' ')
-            message.chunked(80).forEach { logger.warn("[IBUtil] $it") }
+            message.formatForLogging("[IBUtil]").forEach(logger::warn)
 
             null
         }

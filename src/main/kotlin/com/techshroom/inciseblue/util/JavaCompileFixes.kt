@@ -46,10 +46,10 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
         configure<KaptExtension> {
             javacOptions {
                 if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
-                    option("release", javaVersion.majorVersion)
+                    option("-release", javaVersion.majorVersion)
                 }
                 if (javaHome != null) {
-                    option("bootclasspath", javaHome)
+                    option("-bootclasspath", javaHome)
                 }
             }
         }

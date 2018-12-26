@@ -20,5 +20,6 @@ internal fun String.formatForLogging(prefix: String, width: Int = 80): List<Stri
         }
         currentLine.append(word)
     }
+    outputLines.add(currentLine.toString())
     return outputLines
 }

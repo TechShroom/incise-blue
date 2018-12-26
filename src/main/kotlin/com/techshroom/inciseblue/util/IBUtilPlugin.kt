@@ -25,10 +25,12 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 class IBUtilPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.addIBRepositories()
-        project.setNiceJavadocOptions()
-        project.setNiceJavaCompileOptions()
-        project.hookPluginsForJavaVersion()
+        project.afterEvaluate {
+            project.addIBRepositories()
+            project.setNiceJavadocOptions()
+            project.setNiceJavaCompileOptions()
+            project.hookPluginsForJavaVersion()
+        }
     }
 
     private fun Project.addIBRepositories() {

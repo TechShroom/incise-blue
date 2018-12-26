@@ -8,6 +8,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+import org.jetbrains.kotlin.gradle.internal.KaptWithKotlincTask
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import java.io.File
 import java.nio.file.Path
@@ -19,20 +20,20 @@ fun Project.fixJavaCompilation(javaVersion: JavaVersion) {
 
     plugins.withType<JavaBasePlugin> {
         tasks.withType<JavaCompile>().configureEach {
-            // --release only works on >=9, although that's really the only place we need it.
-            if (JavaVersion.toVersion(toolChain.version) >= JavaVersion.VERSION_1_9) {
-                options.compilerArgs.addAll(listOf("--release", javaVersion.majorVersion))
-            }
-            if (javaHome != null) {
-                // attempt to use java home to set bootstrap compatibility
-                // we assume that anything already on there is meant to be there
-                // and will not set it, since it is probably already correct
-                // see: android, where it is set to the android SDK already
-                if (options.bootstrapClasspath == null) {
-                    options.bootstrapClasspath = bscp
-                } else {
-                    logger.info("[IBUtil] Did not set a bootstrap classpath to task $name")
+            // attempt to use java home to set bootstrap compatibility
+            // we assume that anything already on there is meant to be there
+            // and will not set it, since it is probably already correct
+            // see: android, where it is set to the android SDK already
+            if (options.bootstrapClasspath == null) {
+                // --release only works on >=9, although that's really the only place we need it.
+                if (JavaVersion.toVersion(toolChain.version) >= JavaVersion.VERSION_1_9) {
+                    options.compilerArgs.addAll(listOf("--release", javaVersion.majorVersion))
                 }
+                if (javaHome != null) {
+                    options.bootstrapClasspath = bscp
+                }
+            } else {
+                logger.info("[IBUtil] Did not attempt to set a bootstrap classpath to task $name")
             }
         }
     }

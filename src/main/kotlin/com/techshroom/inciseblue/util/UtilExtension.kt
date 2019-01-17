@@ -12,6 +12,10 @@ open class UtilExtension @Inject constructor(private val project: Project) {
         this.javaVersion = JavaVersion.toVersion(javaVersion)
     }
 
+    var addRepositories: Boolean = true
+    var setKotlinJvmTarget: Boolean = true
+    var protectReleaseFromBadJdk: Boolean = true
+
     // a little bit of a hack -- but this is really a call we make, not a flag
     fun enableJUnit5() {
         project.plugins.getPlugin(IBUtilPlugin::class).apply {

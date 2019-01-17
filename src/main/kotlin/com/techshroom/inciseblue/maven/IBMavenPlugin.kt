@@ -10,9 +10,14 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
-import org.gradle.kotlin.dsl.*
+import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 
 class IBMavenPlugin : Plugin<Project> {
@@ -168,22 +173,20 @@ class IBMavenPlugin : Plugin<Project> {
     }
 
     private fun createSourceJarTask(project: Project): NamedDomainObjectProvider<Jar> {
-        val sourceJar by project.tasks.registering(Jar::class) {
+        return project.tasks.register<Jar>("sourceJar") {
             dependsOn("classes")
-            classifier = "sources"
+            archiveClassifier.set("sources")
             val sourceSets = project.extensions.getByType<SourceSetContainer>()
             from(sourceSets.named("main").get().allSource)
         }
-        return sourceJar
     }
 
     private fun createJavadocJarTask(project: Project): NamedDomainObjectProvider<Jar> {
-        val javadocJar by project.tasks.registering(Jar::class) {
+        return project.tasks.register<Jar>("javadocJar") {
             val jdTask = project.tasks.withType<Javadoc>().named("javadoc").get()
             dependsOn(jdTask)
-            classifier = "javadoc"
+            archiveClassifier.set("javadoc")
             from(jdTask.destinationDir)
         }
-        return javadocJar
     }
 }

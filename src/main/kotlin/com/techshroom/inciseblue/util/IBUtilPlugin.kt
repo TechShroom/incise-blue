@@ -1,8 +1,11 @@
 package com.techshroom.inciseblue.util
 
 import com.techshroom.inciseblue.ibExt
+import net.researchgate.release.ReleasePlugin
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.GroovyBasePlugin
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.scala.ScalaBasePlugin
@@ -14,6 +17,7 @@ import org.gradle.api.tasks.scala.ScalaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.ide.eclipse.EclipsePlugin
@@ -21,6 +25,7 @@ import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 class IBUtilPlugin : Plugin<Project> {
@@ -34,6 +39,9 @@ class IBUtilPlugin : Plugin<Project> {
     }
 
     private fun Project.addIBRepositories() {
+        if (!ibExt.util.addRepositories) {
+            return
+        }
         repositories {
             jcenter()
             maven {
@@ -97,8 +105,18 @@ class IBUtilPlugin : Plugin<Project> {
         plugins.withType<IdeaPlugin> {
             applyJavaVersionToIntellij()
         }
-        plugins.withId("org.jetbrains.kotlin.kapt") {
-            applyJavaVersionToKapt()
+        if (ibExt.util.setKotlinJvmTarget) {
+            plugins.withId("org.jetbrains.kotlin.jvm") {
+                applyJavaVersionToKotlin()
+            }
+            plugins.withId("org.jetbrains.kotlin.kapt") {
+                applyJavaVersionToKapt()
+            }
+        }
+        if (ibExt.util.protectReleaseFromBadJdk) {
+            plugins.withId("net.researchgate.release") {
+                ensureReleasedJavaVersion()
+            }
         }
     }
 
@@ -136,12 +154,39 @@ class IBUtilPlugin : Plugin<Project> {
         }
     }
 
+    private fun Project.applyJavaVersionToKotlin() {
+        tasks.withType<KotlinJvmCompile>().configureEach {
+            kotlinOptions {
+                jvmTarget = when {
+                    ibExt.util.javaVersion.isJava8Compatible -> "1.8"
+                    else -> "1.6"
+                }
+            }
+        }
+    }
+
     private fun Project.applyJavaVersionToKapt() {
         configure<KaptExtension> {
             javacOptions {
                 option("-target", ibExt.util.javaVersion.toString())
                 option("-source", ibExt.util.javaVersion.toString())
             }
+        }
+    }
+
+    private fun Project.ensureReleasedJavaVersion() {
+        val checkJavaVersion = tasks.register("checkJavaVersion") {
+            description = "Verifies that the current Java version is what the project requests."
+            group = ReleasePlugin.getRELEASE_GROUP()
+            doLast {
+                val javaVersion = ibExt.util.javaVersion
+                if (JavaVersion.current() != javaVersion) {
+                    throw IllegalStateException("This project must be built with JDK $javaVersion")
+                }
+            }
+        }
+        tasks.named<Task>("beforeReleaseBuild") {
+            dependsOn(checkJavaVersion)
         }
     }
 

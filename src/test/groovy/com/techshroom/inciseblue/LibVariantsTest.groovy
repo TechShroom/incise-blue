@@ -21,6 +21,37 @@ class LibVariantsTest extends Specification {
         """
     }
 
+    def "can use commonLib in kotlin"() {
+        when:
+        buildFile = testProjectDir.newFile('build.gradle.kts')
+        buildFile << """
+            import com.techshroom.inciseblue.commonLib
+            import com.techshroom.inciseblue.invoke
+            plugins {
+                id("com.techshroom.incise-blue")
+            }
+
+            dependencies {
+                commonLib("group", "name", "version") {
+                    val libA = lib()
+                    val libB = lib("b")
+                    assert(listOf(libA, libB).all { it.group == "group" })
+                    assert(listOf(libA, libB).all { it.version == "version" })
+                    assert(libA.name == "name")
+                    assert(libB.name == "name-b")
+                }
+            }
+        """
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('tasks', '-Si')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        result.task(":tasks").outcome == TaskOutcome.SUCCESS
+    }
+
     def "can use commonLib in groovy"() {
         when:
         newBuildFile()

@@ -10,11 +10,15 @@ import static com.techshroom.inciseblue.LibVariantsKt.commonLib
  */
 class LibVariantsExtension {
 
-    static void commonLib(Project self,
+    static LibVariantPicker commonLib(Project self,
                           String group,
                           String nameBase,
                           String version,
-                          @DelegatesTo(LibVariantPicker) Closure<?> variantPicker) {
-        commonLib(self, group, nameBase, version, ConfigureUtil.configureUsing(variantPicker))
+                          @DelegatesTo(LibVariantPicker) Closure<?> variantPicker = null) {
+        def lib = commonLib(self, group, nameBase, version)
+        if (variantPicker != null) {
+            ConfigureUtil.configureUsing(variantPicker).execute(lib)
+        }
+        return lib
     }
 }

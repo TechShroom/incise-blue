@@ -168,8 +168,12 @@ class IBUtilPlugin : Plugin<Project> {
     private fun Project.applyJavaVersionToKapt() {
         configure<KaptExtension> {
             javacOptions {
-                option("-target", ibExt.util.javaVersion.toString())
-                option("-source", ibExt.util.javaVersion.toString())
+                if (JavaVersion.current().isJava9Compatible) {
+                    option("-release", ibExt.util.javaVersion.toString())
+                } else if (JavaVersion.current() != ibExt.util.javaVersion) {
+                    logger.warn("Cannot set Java version for Kapt on ${JavaVersion.current()}," +
+                            " it does not support -release.")
+                }
             }
         }
     }

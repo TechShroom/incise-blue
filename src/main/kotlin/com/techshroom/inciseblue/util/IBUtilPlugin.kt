@@ -46,7 +46,7 @@ class IBUtilPlugin : Plugin<Project> {
             jcenter()
             maven {
                 name = "Sonatype Releases"
-                url = uri("https://oss.sonatype.org/content/repositories/releases/")
+                url = uri("https://oss.sonatype.org/content/repositories/public/")
                 metadataSources {
                     mavenPom()
                 }

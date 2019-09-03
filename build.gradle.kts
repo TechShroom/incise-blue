@@ -1,9 +1,7 @@
-import org.gradle.api.internal.tasks.DefaultTaskDependency
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.gradle.plugin-publish") version "0.10.0"
+    id("com.gradle.plugin-publish") version "0.10.1"
     kotlin("jvm") version embeddedKotlinVersion
     `kotlin-dsl`
     `java-gradle-plugin`
@@ -25,8 +23,8 @@ dependencies {
     compileOnly(kotlin("gradle-plugin"))
 
     testImplementation("junit:junit:4.12")
-    testImplementation("com.google.guava:guava:27.0.1-jre")
-    testImplementation("org.spockframework:spock-core:1.2-groovy-2.5") {
+    testImplementation("com.google.guava:guava:28.1-jre")
+    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5") {
         exclude(group = "org.codehaus.groovy")
     }
 }

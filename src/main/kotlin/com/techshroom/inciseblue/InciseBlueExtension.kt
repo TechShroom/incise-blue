@@ -2,6 +2,8 @@ package com.techshroom.inciseblue
 
 import com.techshroom.inciseblue.ide.IBIdePlugin
 import com.techshroom.inciseblue.ide.IdeExtension
+import com.techshroom.inciseblue.jfx.IBJfxPlugin
+import com.techshroom.inciseblue.jfx.JfxExtension
 import com.techshroom.inciseblue.license.IBLicensePlugin
 import com.techshroom.inciseblue.lwjgl.IBLwjglPlugin
 import com.techshroom.inciseblue.lwjgl.LwjglExtension
@@ -17,6 +19,7 @@ import org.gradle.kotlin.dsl.*
 open class InciseBlueExtension constructor(private val project: Project) {
 
     val lwjgl: LwjglExtension = project.objects.newInstance()
+    val jfx: JfxExtension = project.objects.newInstance()
     val maven: MavenExtension = project.objects.newInstance(project)
     val util: UtilExtension = project.objects.newInstance(project)
     val ide: IdeExtension = project.objects.newInstance()
@@ -29,6 +32,12 @@ open class InciseBlueExtension constructor(private val project: Project) {
 
     fun license() {
         addPlugin<IBLicensePlugin>()
+    }
+
+    @JvmOverloads
+    fun jfx(config: Action<JfxExtension>? = null) {
+        addPlugin<IBJfxPlugin>()
+        config?.execute(jfx)
     }
 
     @JvmOverloads

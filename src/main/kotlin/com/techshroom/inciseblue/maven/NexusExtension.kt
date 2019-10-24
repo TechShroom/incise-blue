@@ -24,7 +24,7 @@ abstract class NexusExtension @Inject constructor(project: Project) {
     init {
         signing.convention(System.getenv("CI")?.toBoolean() != true)
         repo.convention(project.uri(
-            "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            "https://oss.sonatype.org/service/local/"
         ))
         snapshotRepo.convention(project.uri(
             "https://oss.sonatype.org/content/repositories/snapshots/"

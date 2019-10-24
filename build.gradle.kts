@@ -6,7 +6,7 @@ plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
     groovy
-    id("net.researchgate.release") version "2.8.0"
+    id("net.researchgate.release") version "2.8.1"
     id("com.palantir.idea-test-fix") version "0.1.0"
 }
 
@@ -18,7 +18,7 @@ repositories {
 dependencies {
     api(gradleApi())
     implementation("gradle.plugin.net.minecrell:licenser:0.4.1")
-    implementation("net.researchgate:gradle-release:2.8.0")
+    implementation("net.researchgate:gradle-release:2.8.1")
     implementation("de.marcphilipp.gradle:nexus-publish-plugin:0.4.0")
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(kotlin("gradle-plugin"))

@@ -8,17 +8,11 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
-import org.gradle.plugins.signing.SigningExtension
 
 class IBMavenPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -34,7 +28,7 @@ class IBMavenPlugin : Plugin<Project> {
         val publishTaskProvider = project.tasks.named("publish")
 
         hookReleasePlugin(project, publishTaskProvider)
-        disableIfNeeded(publishTaskProvider, isSnapshot, project)
+        project.disableIfNeeded(publishTaskProvider, isSnapshot)
     }
 
     private fun configureMavenPublish(project: Project, isSnapshot: Boolean, creds: Credentials?, sourceJar: NamedDomainObjectProvider<Jar>, javadocJar: NamedDomainObjectProvider<Jar>) {
@@ -57,20 +51,8 @@ class IBMavenPlugin : Plugin<Project> {
                 }
             }
 
-            applySigningIfNeeded(cfg, project)
-        }
-    }
-
-    private fun applySigningIfNeeded(cfg: MavenExtension, project: Project) {
-        if (cfg.doSigning) {
-            project.logger.lifecycle("[IBMaven] Signing enabled.")
-            project.apply(plugin = "signing")
-            project.configure<SigningExtension> {
-                // Only sign if it's possible.
-                if (this.signatories.getDefaultSignatory(project) != null) {
-                    sign(project.extensions.getByType<PublishingExtension>()
-                            .publications.getByName("maven"))
-                }
+            if (cfg.doSigning) {
+                applySigning(project)
             }
         }
     }
@@ -128,43 +110,22 @@ class IBMavenPlugin : Plugin<Project> {
         }
     }
 
-    private fun disableIfNeeded(publishTaskProvider: TaskProvider<Task>, isSnapshot: Boolean, project: Project) {
-        publishTaskProvider.configure {
-            onlyIf {
-                val isTravis = System.getenv("TRAVIS")?.toBoolean() == true
-                val enabled = isSnapshot || !isTravis
-                if (!enabled) {
-                    project.logger.lifecycle("[IBMaven] Disabling uploads for non-SNAPSHOT Travis build.")
-                }
-                enabled
-            }
-        }
-    }
-
-    private fun hookReleasePlugin(project: Project, publishTaskProvider: TaskProvider<Task>) {
-        project.plugins.withId("net.researchgate.release") {
-            project.tasks.named("afterReleaseBuild").configure {
-                dependsOn(publishTaskProvider)
-            }
-        }
-    }
-
     private data class Credentials(val username: String, val password: String)
 
     private fun ossrhCreds(project: Project): Credentials? {
         val usernameOptions = listOf(
-                project.findProperty("ossrhUsername") as? String
+            project.findProperty("ossrhUsername") as? String
         )
         val passwordOptions = listOf(
-                project.findProperty("ossrhPassword") as? String,
-                System.getenv("OSSRH_PASSWORD")
+            project.findProperty("ossrhPassword") as? String,
+            System.getenv("OSSRH_PASSWORD")
         )
         val username = usernameOptions
-                .mapNotNull { it.blankToNull() }
-                .firstOrNull()
+            .mapNotNull { it.blankToNull() }
+            .firstOrNull()
         val password = passwordOptions
-                .mapNotNull { it.blankToNull() }
-                .firstOrNull()
+            .mapNotNull { it.blankToNull() }
+            .firstOrNull()
 
         return when {
             username == null || password == null -> null
@@ -172,21 +133,4 @@ class IBMavenPlugin : Plugin<Project> {
         }
     }
 
-    private fun createSourceJarTask(project: Project): NamedDomainObjectProvider<Jar> {
-        return project.tasks.register<Jar>("sourceJar") {
-            dependsOn("classes")
-            archiveClassifier.set("sources")
-            val sourceSets = project.extensions.getByType<SourceSetContainer>()
-            from(sourceSets.named("main").get().allSource)
-        }
-    }
-
-    private fun createJavadocJarTask(project: Project): NamedDomainObjectProvider<Jar> {
-        return project.tasks.register<Jar>("javadocJar") {
-            val jdTask = project.tasks.withType<Javadoc>().named("javadoc").get()
-            dependsOn(jdTask)
-            archiveClassifier.set("javadoc")
-            from(jdTask.destinationDir)
-        }
-    }
 }

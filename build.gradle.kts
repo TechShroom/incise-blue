@@ -19,6 +19,7 @@ dependencies {
     api(gradleApi())
     implementation("gradle.plugin.net.minecrell:licenser:0.4.1")
     implementation("net.researchgate:gradle-release:2.8.0")
+    implementation("de.marcphilipp.gradle:nexus-publish-plugin:0.4.0")
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(kotlin("gradle-plugin"))
 

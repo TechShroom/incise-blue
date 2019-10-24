@@ -8,7 +8,9 @@ import com.techshroom.inciseblue.license.IBLicensePlugin
 import com.techshroom.inciseblue.lwjgl.IBLwjglPlugin
 import com.techshroom.inciseblue.lwjgl.LwjglExtension
 import com.techshroom.inciseblue.maven.IBMavenPlugin
+import com.techshroom.inciseblue.maven.IBNexusPlugin
 import com.techshroom.inciseblue.maven.MavenExtension
+import com.techshroom.inciseblue.maven.NexusExtension
 import com.techshroom.inciseblue.util.IBUtilPlugin
 import com.techshroom.inciseblue.util.UtilExtension
 import org.gradle.api.Action
@@ -21,6 +23,7 @@ open class InciseBlueExtension constructor(private val project: Project) {
     val lwjgl: LwjglExtension = project.objects.newInstance()
     val jfx: JfxExtension = project.objects.newInstance()
     val maven: MavenExtension = project.objects.newInstance(project)
+    val nexus: NexusExtension = project.objects.newInstance(project)
     val util: UtilExtension = project.objects.newInstance(project)
     val ide: IdeExtension = project.objects.newInstance()
 
@@ -50,6 +53,12 @@ open class InciseBlueExtension constructor(private val project: Project) {
     fun maven(config: Action<MavenExtension>? = null) {
         addPlugin<IBMavenPlugin>()
         config?.execute(maven)
+    }
+
+    @JvmOverloads
+    fun nexus(config: Action<NexusExtension>? = null) {
+        addPlugin<IBNexusPlugin>()
+        config?.execute(nexus)
     }
 
     @JvmOverloads

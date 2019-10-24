@@ -57,6 +57,11 @@ abstract class NexusExtension @Inject constructor(project: Project) {
         developers.add(developer)
     }
 
+    fun license(license: License) {
+        licenseName.set(license.licenseName)
+        licenseUrl.set(license.licenseUrl)
+    }
+
     fun coords(owner: String, repo: String) {
         coord.set("/$owner/$repo")
     }

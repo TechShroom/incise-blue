@@ -24,6 +24,8 @@ class IBLicensePlugin : Plugin<Project> {
             header = rp.file("HEADER.txt")
             ignoreFailures = false
             include("**/*.java")
+            include("**/*.kt")
+            include("**/*.groovy")
         }
     }
 }

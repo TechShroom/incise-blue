@@ -7,7 +7,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 class JfxProjectTest extends Specification {
-    private static final String JFX_VERSION = "3.1.6"
+    private static final String JFX_VERSION = "12.0.2"
 
     @Rule
     final TemporaryFolder testProjectDir = new TemporaryFolder()

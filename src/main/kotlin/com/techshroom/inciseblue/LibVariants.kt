@@ -34,9 +34,10 @@ class LibVariantPickerImpl(
     override fun lib() = libShared("")
     override fun lib(name: String) = libShared(name)
     private fun libShared(name: String): Dependency {
-        val calcName = when {
-            name.isEmpty() -> nameBase
-            else -> "$nameBase-$name"
+        val calcName = "$nameBase-$name".trim('-')
+
+        require(calcName.isNotEmpty()) {
+            "One of name base or provided name must not be empty"
         }
 
         return project.dependencies.create(mapOf(

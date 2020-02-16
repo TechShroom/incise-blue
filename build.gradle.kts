@@ -71,12 +71,13 @@ pluginBundle {
     }
 }
 
+val jdk = JavaVersion.VERSION_1_8
 // validate the current JDK, we must be running under JDK 8.
 val verifyJavaVersionForPublish by tasks.registering {
     description = "Validates the JDK for the publish build, to ensure consistency."
     doLast {
-        if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-            throw IllegalStateException("Must build release with JDK 8.")
+        if (JavaVersion.current() != jdk) {
+            throw IllegalStateException("Must build release with JDK ${jdk}.")
         }
     }
 }
@@ -87,4 +88,8 @@ release {
 
 tasks.named<Task>("afterReleaseBuild") {
     dependsOn("publishPlugins")
+}
+
+require(JavaVersion.current().isCompatibleWith(jdk)) {
+    "Must build with a JDK compatible with $jdk"
 }

@@ -34,6 +34,10 @@ class IBUtilPlugin : Plugin<Project> {
             project.addIBRepositories()
             project.setNiceJavadocOptions()
             project.setNiceJavaCompileOptions()
+            require(JavaVersion.current().isCompatibleWith(ibExt.util.javaVersion)) {
+                "Your Java version (${JavaVersion.current()}) is not compatible with" +
+                    " the project's requested version (${ibExt.util.javaVersion})"
+            }
             project.hookPluginsForJavaVersion()
         }
     }
